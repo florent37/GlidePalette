@@ -11,13 +11,13 @@ import java.util.ArrayList;
  */
 public class PaletteTarget {
 
-    @GlidePalette.Profile.PaletteProfile
+    @BitmapPalette.Profile.PaletteProfile
     protected int paletteProfile = GlidePalette.Profile.VIBRANT;
 
     protected ArrayList<Pair<View, Integer>> targetsBackground = new ArrayList<>();
     protected ArrayList<Pair<TextView, Integer>> targetsText = new ArrayList<>();
 
-    public PaletteTarget(@GlidePalette.Profile.PaletteProfile int paletteProfile) {
+    public PaletteTarget(@BitmapPalette.Profile.PaletteProfile int paletteProfile) {
         this.paletteProfile = paletteProfile;
     }
 
