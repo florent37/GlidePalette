@@ -9,9 +9,6 @@ import android.util.LruCache;
 import android.view.View;
 import android.widget.TextView;
 
-import com.bumptech.glide.load.resource.drawable.GlideDrawable;
-import com.bumptech.glide.request.RequestListener;
-
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
@@ -61,7 +58,7 @@ public abstract class BitmapPalette {
     protected String url;
 
     protected LinkedList<PaletteTarget> targets = new LinkedList<>();
-    protected ArrayList<GlidePalette.CallBack> callbacks = new ArrayList<>();
+    protected ArrayList<BitmapPalette.CallBack> callbacks = new ArrayList<>();
 
     public BitmapPalette use(@Profile.PaletteProfile int paletteProfile) {
         this.targets.add(new PaletteTarget(paletteProfile));
@@ -85,7 +82,7 @@ public abstract class BitmapPalette {
         return this;
     }
 
-    protected BitmapPalette intoCallBack(GlidePalette.CallBack callBack) {
+    protected BitmapPalette intoCallBack(BitmapPalette.CallBack callBack) {
         if (callBack != null)
             callbacks.add(callBack);
         return this;
@@ -95,7 +92,7 @@ public abstract class BitmapPalette {
     //region apply
 
     protected void apply(Palette palette) {
-        for (GlidePalette.CallBack c : callbacks) {
+        for (BitmapPalette.CallBack c : callbacks) {
             c.onPaletteLoaded(palette);
         }
 
