@@ -1,8 +1,6 @@
 GlidePalette
 =======
 
-[![Build Status](https://travis-ci.org/florent37/GlidePalette.svg)](https://travis-ci.org/florent37/GlidePalette)
-
 ![Alt sample](https://raw.githubusercontent.com/florent37/GlidePalette/master/screenshot/night_small_2.png)
 
 #Download
@@ -111,7 +109,7 @@ Looking for contributors, feel free to fork !
 
 #Credits
 
-Author: Florent Champigny
+Author: Florent Champigny www.florentchampigny.com/
 
 <a href="https://plus.google.com/+florentchampigny">
   <img alt="Follow me on Google+"
