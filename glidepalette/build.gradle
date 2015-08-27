@@ -2,7 +2,7 @@ apply plugin: 'com.android.library'
 apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'com.jfrog.bintray'
 
-version = "1.0.2"
+version = "1.0.3"
 
 android {
     compileSdkVersion 23
@@ -28,7 +28,6 @@ dependencies {
     compile 'com.android.support:support-v4:23.0.0'
     compile 'com.github.bumptech.glide:glide:3.6.1'
 }
-
 
 //https://github.com/danielemaddaluno/gradle-jcenter-publish
 
@@ -105,7 +104,7 @@ artifacts {
 
 Properties properties = new Properties()
 File f = new File("local.properties")
-if(f.exists()) {
+if (f.exists()) {
     properties.load(project.rootProject.file('local.properties').newDataInputStream())
 }
 
