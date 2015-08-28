@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="palette-v7-23.0.0">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/glidepalette/build/intermediates/exploded-aar/com.android.support/palette-v7/23.0.0/jars/classes.jar!/" />
+      <root url="file://$PROJECT_DIR$/glidepalette/build/intermediates/exploded-aar/com.android.support/palette-v7/23.0.0/res" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/android/sdk/extras/android/m2repository/com/android/support/palette-v7/23.0.0/palette-v7-23.0.0-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
