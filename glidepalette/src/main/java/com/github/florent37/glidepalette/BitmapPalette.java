@@ -1,6 +1,12 @@
 package com.github.florent37.glidepalette;
 
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.TransitionDrawable;
+import android.os.Build;
 import android.support.annotation.IntDef;
 import android.support.v4.util.Pair;
 import android.support.v7.graphics.Palette;
@@ -65,21 +71,38 @@ public abstract class BitmapPalette {
         return this;
     }
 
-
     protected BitmapPalette intoBackground(View view, @Swatch.PaletteSwatch int paletteSwatch) {
-        if (this.targets.isEmpty())
-            throw new UnsupportedOperationException("You must specify a palette with use(Profile.PaletteProfile)");
+        assertTargetsIsNotEmpty();
 
         this.targets.getLast().targetsBackground.add(new Pair<>(view, paletteSwatch));
         return this;
     }
 
     protected BitmapPalette intoTextColor(TextView textView, @Swatch.PaletteSwatch int paletteSwatch) {
-        if (this.targets.isEmpty())
-            throw new UnsupportedOperationException("You must specify a palette with use(Profile.PaletteProfile)");
+        assertTargetsIsNotEmpty();
 
         this.targets.getLast().targetsText.add(new Pair<>(textView, paletteSwatch));
         return this;
+    }
+
+    protected BitmapPalette crossfade(boolean crossfade) {
+        assertTargetsIsNotEmpty();
+
+        this.targets.getLast().targetCrossfade = crossfade;
+        return this;
+    }
+
+    protected BitmapPalette crossfade(boolean crossfade, int crossfadeSpeed) {
+        assertTargetsIsNotEmpty();
+
+        this.targets.getLast().targetCrossfadeSpeed = crossfadeSpeed;
+        return this.crossfade(crossfade);
+    }
+
+    private void assertTargetsIsNotEmpty() {
+        if (this.targets.isEmpty()) {
+            throw new UnsupportedOperationException("You must specify a palette with use(Profile.PaletteProfile)");
+        }
     }
 
     protected BitmapPalette intoCallBack(BitmapPalette.CallBack callBack) {
@@ -92,7 +115,7 @@ public abstract class BitmapPalette {
     //region apply
 
     protected void apply(Palette palette) {
-        for (BitmapPalette.CallBack c : callbacks) {
+        for (CallBack c : callbacks) {
             c.onPaletteLoaded(palette);
         }
 
@@ -122,7 +145,11 @@ public abstract class BitmapPalette {
             if (swatch != null) {
                 for (Pair<View, Integer> t : target.targetsBackground) {
                     int color = getColor(swatch, t.second);
-                    t.first.setBackgroundColor(color);
+                    if (target.targetCrossfade) {
+                        crossfadeTargetBackground(target, t, color);
+                    } else {
+                        t.first.setBackgroundColor(color);
+                    }
                 }
 
                 for (Pair<TextView, Integer> t : target.targetsText) {
@@ -134,6 +161,27 @@ public abstract class BitmapPalette {
                 this.callbacks = null;
             }
         }
+    }
+
+    private void crossfadeTargetBackground(PaletteTarget target, Pair<View, Integer> t, int newColor) {
+        final Bitmap next = Bitmap.createBitmap(t.first.getWidth(), t.first.getHeight(), Bitmap.Config.ARGB_8888);
+        final Canvas canvas = new Canvas(next);
+        canvas.drawColor(newColor);
+
+        final Drawable oldColor = t.first.getBackground();
+        final BitmapDrawable newBackground = new BitmapDrawable(t.first.getResources(), next);
+        final Drawable[] drawables = new Drawable[2];
+
+        drawables[0] = oldColor != null ? oldColor : new ColorDrawable(t.first.getSolidColor());
+        drawables[1] = newBackground;
+        TransitionDrawable transitionDrawable = new TransitionDrawable(drawables);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            t.first.setBackground(transitionDrawable);
+        } else {
+            t.first.setBackgroundDrawable(transitionDrawable);
+        }
+        transitionDrawable.startTransition(target.targetCrossfadeSpeed);
     }
 
     protected static int getColor(Palette.Swatch swatch, @Swatch.PaletteSwatch int paletteSwatch) {
