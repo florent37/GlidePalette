@@ -47,6 +47,16 @@ public class GlidePalette extends BitmapPalette implements RequestListener<Strin
         return this;
     }
 
+    public GlidePalette crossfade(boolean crossfade) {
+        super.crossfade(crossfade);
+        return this;
+    }
+
+    public GlidePalette crossfade(boolean crossfade, int crossfadeSpeed) {
+        super.crossfade(crossfade, crossfadeSpeed);
+        return this;
+    }
+
     public GlidePalette setGlideListener(RequestListener<String, GlideDrawable> listener) {
         this.callback = listener;
         return this;
