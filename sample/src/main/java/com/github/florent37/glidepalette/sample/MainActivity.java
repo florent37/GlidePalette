@@ -45,7 +45,6 @@ public class MainActivity extends AppCompatActivity {
                         .use(GlidePalette.Profile.MUTED)
                         .intoBackground(textMuted, GlidePalette.Swatch.RGB)
                         .intoTextColor(textMuted, GlidePalette.Swatch.BODY_TEXT_COLOR)
-                        .crossfade(false)
                         .use(GlidePalette.Profile.MUTED_DARK)
                         .intoBackground(textMutedDark, GlidePalette.Swatch.RGB)
                         .intoTextColor(textMutedDark, GlidePalette.Swatch.BODY_TEXT_COLOR)
@@ -53,7 +52,6 @@ public class MainActivity extends AppCompatActivity {
                         .use(GlidePalette.Profile.MUTED_LIGHT)
                         .intoBackground(textMutedLight, GlidePalette.Swatch.RGB)
                         .intoTextColor(textMutedLight, GlidePalette.Swatch.BODY_TEXT_COLOR)
-                        .crossfade(false)
 
                         .intoCallBack(new GlidePalette.CallBack() {
 
