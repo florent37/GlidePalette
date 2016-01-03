@@ -22,6 +22,7 @@ Glide.with(this).load(url)
                .use(GlidePalette.Profile.VIBRANT)
                     .intoBackground(titleView, GlidePalette.Swatch.RGB)
                     .intoTextColor(titleView, GlidePalette.Swatch.BODY_TEXT_COLOR)
+                    .crossfade(true)
          );
          .into(imageView);
 ```
@@ -36,7 +37,7 @@ GlidePalette.with(url)
 
 ##Palettes
 
-You can successively use following palettes :
+You can successively use following Palettes :
 
 - Palette.VIBRANT
 - Palette.VIBRANT_DARK
@@ -60,7 +61,7 @@ You can successively use following palettes :
 
 ##Swatches
 
-With the following Swatchs
+With the following Swatches
 
 - RGB
 - TITLE_TEXT_COLOR
@@ -80,6 +81,14 @@ And TextView Color
 ```java
 .intoTextColor(textView)
 .intoTextColor(textView,Swatch.TITLE_TEXT_COLOR)
+```
+
+with optional Background Crossfade effect
+```java
+.crossfade(true)
+    // will use default 300ms crossfade
+.crossfade(true, 1000)
+    // specify own crossfade speed in ms
 ```
 
 #CallBack
