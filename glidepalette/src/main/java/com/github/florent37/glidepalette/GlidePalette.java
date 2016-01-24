@@ -11,9 +11,9 @@ import com.bumptech.glide.request.target.Target;
 /**
  * Created by florentchampigny on 08/05/15.
  */
-public class GlidePalette extends BitmapPalette implements RequestListener<String, GlideDrawable> {
+public class GlidePalette<ModelType> extends BitmapPalette implements RequestListener<ModelType, GlideDrawable> {
 
-    protected RequestListener<String, GlideDrawable> callback;
+    protected RequestListener<ModelType, GlideDrawable> callback;
 
     protected GlidePalette() {
     }
@@ -57,7 +57,7 @@ public class GlidePalette extends BitmapPalette implements RequestListener<Strin
         return this;
     }
 
-    public GlidePalette setGlideListener(RequestListener<String, GlideDrawable> listener) {
+    public GlidePalette setGlideListener(RequestListener<ModelType, GlideDrawable> listener) {
         this.callback = listener;
         return this;
     }
@@ -72,14 +72,14 @@ public class GlidePalette extends BitmapPalette implements RequestListener<Strin
     //region Glide.Listener
 
     @Override
-    public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
+    public boolean onException(Exception e, ModelType model, Target<GlideDrawable> target, boolean isFirstResource) {
         if (this.callback != null)
             this.callback.onException(e, model, target, isFirstResource);
         return false;
     }
 
     @Override
-    public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+    public boolean onResourceReady(GlideDrawable resource, ModelType model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
         if (this.callback != null)
             this.callback.onResourceReady(resource, model, target, isFromMemoryCache, isFirstResource);
 
