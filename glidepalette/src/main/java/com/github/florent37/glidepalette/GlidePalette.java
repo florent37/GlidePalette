@@ -15,16 +15,11 @@ public class GlidePalette<ModelType> extends BitmapPalette implements RequestLis
 
     protected RequestListener<ModelType, GlideDrawable> callback;
 
-    protected GlidePalette() {
+    public GlidePalette() {
+
     }
 
-    public static GlidePalette with(String url) {
-        GlidePalette glidePalette = new GlidePalette();
-        glidePalette.url = url;
-        return glidePalette;
-    }
-
-    public GlidePalette use(@Profile.PaletteProfile int paletteProfile) {
+    public GlidePalette use(@Profile int paletteProfile) {
         super.use(paletteProfile);
         return this;
     }
@@ -33,7 +28,7 @@ public class GlidePalette<ModelType> extends BitmapPalette implements RequestLis
         return this.intoBackground(view, Swatch.RGB);
     }
 
-    public GlidePalette intoBackground(View view, @Swatch.PaletteSwatch int paletteSwatch) {
+    public GlidePalette intoBackground(View view, @Swatch int paletteSwatch) {
         super.intoBackground(view, paletteSwatch);
         return this;
     }
@@ -42,7 +37,7 @@ public class GlidePalette<ModelType> extends BitmapPalette implements RequestLis
         return this.intoTextColor(textView, Swatch.TITLE_TEXT_COLOR);
     }
 
-    public GlidePalette intoTextColor(TextView textView, @Swatch.PaletteSwatch int paletteSwatch) {
+    public GlidePalette intoTextColor(TextView textView, @Swatch int paletteSwatch) {
         super.intoTextColor(textView, paletteSwatch);
         return this;
     }
