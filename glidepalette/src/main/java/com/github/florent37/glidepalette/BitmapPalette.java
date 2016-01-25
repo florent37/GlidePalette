@@ -1,8 +1,6 @@
 package com.github.florent37.glidepalette;
 
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.TransitionDrawable;
@@ -164,16 +162,12 @@ public abstract class BitmapPalette {
     }
 
     private void crossfadeTargetBackground(PaletteTarget target, Pair<View, Integer> t, int newColor) {
-        final Bitmap next = Bitmap.createBitmap(t.first.getWidth(), t.first.getHeight(), Bitmap.Config.ARGB_8888);
-        final Canvas canvas = new Canvas(next);
-        canvas.drawColor(newColor);
 
         final Drawable oldColor = t.first.getBackground();
-        final BitmapDrawable newBackground = new BitmapDrawable(t.first.getResources(), next);
         final Drawable[] drawables = new Drawable[2];
 
         drawables[0] = oldColor != null ? oldColor : new ColorDrawable(t.first.getSolidColor());
-        drawables[1] = newBackground;
+        drawables[1] = new ColorDrawable(newColor);
         TransitionDrawable transitionDrawable = new TransitionDrawable(drawables);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
