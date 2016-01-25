@@ -9,7 +9,6 @@ import android.support.annotation.IntDef;
 import android.support.v4.util.Pair;
 import android.support.v7.graphics.Palette;
 import android.util.Log;
-import android.util.LruCache;
 import android.view.View;
 import android.widget.TextView;
 
@@ -17,6 +16,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.Map;
+import java.util.WeakHashMap;
 
 /**
  * Created by florentchampigny on 16/07/15.
@@ -28,8 +29,6 @@ public abstract class BitmapPalette {
     public interface CallBack {
         void onPaletteLoaded(Palette palette);
     }
-
-    private static LruCache<String, Palette> cache = new LruCache<>(40);
 
     @IntDef({Profile.VIBRANT, Profile.VIBRANT_DARK, Profile.VIBRANT_LIGHT,
             Profile.MUTED, Profile.MUTED_DARK, Profile.MUTED_LIGHT})
@@ -51,13 +50,15 @@ public abstract class BitmapPalette {
         int BODY_TEXT_COLOR = 2;
     }
 
-    protected BitmapPalette() {
-    }
+    private static final Map<Bitmap, Palette> CACHE = new WeakHashMap<>();
 
     protected String url;
 
     protected LinkedList<PaletteTarget> targets = new LinkedList<>();
     protected ArrayList<BitmapPalette.CallBack> callbacks = new ArrayList<>();
+
+    protected BitmapPalette() {
+    }
 
     public BitmapPalette use(@Profile int paletteProfile) {
         this.targets.add(new PaletteTarget(paletteProfile));
@@ -107,7 +108,14 @@ public abstract class BitmapPalette {
 
     //region apply
 
-    protected void apply(Palette palette) {
+    /**
+     * Apply the Palette Profile & Swatch to our current targets
+     *
+     * @param palette  the palette to apply
+     * @param cacheHit true if the palette was retrieved from the cache, else false
+     */
+    protected void apply(Palette palette, boolean cacheHit) {
+
         for (CallBack c : callbacks) {
             c.onPaletteLoaded(palette);
         }
@@ -138,7 +146,8 @@ public abstract class BitmapPalette {
             if (swatch != null) {
                 for (Pair<View, Integer> t : target.targetsBackground) {
                     int color = getColor(swatch, t.second);
-                    if (target.targetCrossfade) {
+                    //Only crossfade if we're not coming from a cache hit.
+                    if (!cacheHit && target.targetCrossfade) {
                         crossfadeTargetBackground(target, t, color);
                     } else {
                         t.first.setBackgroundColor(color);
@@ -189,15 +198,16 @@ public abstract class BitmapPalette {
         return 0;
     }
 
-    protected void start(Bitmap bitmap) {
-        if (cache.get(url) != null) {
-            BitmapPalette.this.apply(cache.get(url));
+    protected void start(final Bitmap bitmap) {
+        Palette palette = CACHE.get(bitmap);
+        if (palette != null) {
+            apply(palette, true);
         } else {
             new Palette.Builder(bitmap).generate(new Palette.PaletteAsyncListener() {
                 @Override
                 public void onGenerated(Palette palette) {
-                    cache.put(url, palette);
-                    BitmapPalette.this.apply(palette);
+                    CACHE.put(bitmap, palette);
+                    apply(palette, false);
                 }
             });
         }
