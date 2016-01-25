@@ -14,7 +14,7 @@ compile 'com.github.florent37:glidepalette:1.0.5@aar'
 
 ```java
 Glide.with(this).load(url)
-         .listener(GlidePalette.with(url)
+         .listener(new GlidePalette()
                .use(GlidePalette.Profile.MUTED_DARK)
                    .intoBackground(textView)
                    .intoTextColor(textView)
@@ -29,10 +29,10 @@ Glide.with(this).load(url)
 
 ##Initialisation
 
-First, init GlidePalette with an **Url**
+First, init GlidePalette
 
 ```java
-GlidePalette.with(url)
+new GlidePalette()
 ```
 
 ##Palettes
