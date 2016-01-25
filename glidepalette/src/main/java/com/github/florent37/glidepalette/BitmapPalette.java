@@ -29,7 +29,7 @@ public abstract class BitmapPalette {
         void onPaletteLoaded(Palette palette);
     }
 
-    private LruCache<String, Palette> cache = new LruCache<>(40);
+    private static LruCache<String, Palette> cache = new LruCache<>(40);
 
     @IntDef({Profile.VIBRANT, Profile.VIBRANT_DARK, Profile.VIBRANT_LIGHT,
             Profile.MUTED, Profile.MUTED_DARK, Profile.MUTED_LIGHT})
