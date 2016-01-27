@@ -8,9 +8,7 @@ import android.os.Build;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.util.Pair;
 import android.support.v7.graphics.Palette;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -21,9 +19,7 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.WeakHashMap;
 
-public abstract class BitmapPalette {
-
-    private static final String TAG = "BitmapPalette";
+public abstract class BitmapPalette implements ColorGenerator {
 
     public interface CallBack {
         void onPaletteLoaded(@Nullable Palette palette);
@@ -66,18 +62,26 @@ public abstract class BitmapPalette {
         return this;
     }
 
-    protected BitmapPalette intoBackground(View view, @Swatch int paletteSwatch) {
+    protected BitmapPalette intoBackground(View view, @Swatch int paletteSwatch, ColorGenerator generator) {
         assertTargetsIsNotEmpty();
 
-        this.targets.getLast().targetsBackground.add(new Pair<>(view, paletteSwatch));
+        this.targets.getLast().targetsBackground.add(new PaletteTarget.Target<>(view, paletteSwatch, generator));
+        return this;
+    }
+
+    protected BitmapPalette intoBackground(View view, @Swatch int paletteSwatch) {
+        return intoBackground(view, paletteSwatch, this);
+    }
+
+    protected BitmapPalette intoTextColor(TextView textView, @Swatch int paletteSwatch, ColorGenerator generator) {
+        assertTargetsIsNotEmpty();
+
+        this.targets.getLast().targetsText.add(new PaletteTarget.Target<>(textView, paletteSwatch, generator));
         return this;
     }
 
     protected BitmapPalette intoTextColor(TextView textView, @Swatch int paletteSwatch) {
-        assertTargetsIsNotEmpty();
-
-        this.targets.getLast().targetsText.add(new Pair<>(textView, paletteSwatch));
-        return this;
+        return intoTextColor(textView, paletteSwatch, this);
     }
 
     protected BitmapPalette crossfade(boolean crossfade) {
@@ -155,19 +159,19 @@ public abstract class BitmapPalette {
 
             if (swatch == null) return;
 
-            for (Pair<View, Integer> t : target.targetsBackground) {
-                int color = getColor(swatch, t.second);
+            for (PaletteTarget.Target t : target.targetsBackground) {
+                int color = t.generator.getColor(t.view, swatch, t.paletteSwatch);
                 //Only crossfade if we're not coming from a cache hit.
                 if (!cacheHit && target.targetCrossfade) {
-                    crossfadeTargetBackground(target, t, color);
+                    crossfadeTargetBackground(target, t.view, color);
                 } else {
-                    t.first.setBackgroundColor(color);
+                    t.view.setBackgroundColor(color);
                 }
             }
 
-            for (Pair<TextView, Integer> t : target.targetsText) {
-                int color = getColor(swatch, t.second);
-                t.first.setTextColor(color);
+            for (PaletteTarget.Target<? extends TextView, ?> t : target.targetsText) {
+                int color = t.generator.getColor(t.view, swatch, t.paletteSwatch);
+                t.view.setTextColor(color);
             }
 
             target.clear();
@@ -175,36 +179,33 @@ public abstract class BitmapPalette {
         }
     }
 
-    private void crossfadeTargetBackground(PaletteTarget target, Pair<View, Integer> t, int newColor) {
+    private void crossfadeTargetBackground(@NonNull PaletteTarget target, @NonNull View view, int newColor) {
 
-        final Drawable oldColor = t.first.getBackground();
+        final Drawable oldColor = view.getBackground();
         final Drawable[] drawables = new Drawable[2];
 
-        drawables[0] = oldColor != null ? oldColor : new ColorDrawable(t.first.getSolidColor());
+        drawables[0] = oldColor != null ? oldColor : new ColorDrawable(view.getSolidColor());
         drawables[1] = new ColorDrawable(newColor);
         TransitionDrawable transitionDrawable = new TransitionDrawable(drawables);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-            t.first.setBackground(transitionDrawable);
+            view.setBackground(transitionDrawable);
         } else {
             //noinspection deprecation
-            t.first.setBackgroundDrawable(transitionDrawable);
+            view.setBackgroundDrawable(transitionDrawable);
         }
         transitionDrawable.startTransition(target.targetCrossfadeSpeed);
     }
 
-    protected static int getColor(Palette.Swatch swatch, @Swatch int paletteSwatch) {
-        if (swatch != null) {
-            switch (paletteSwatch) {
-                case Swatch.RGB:
-                    return swatch.getRgb();
-                case Swatch.TITLE_TEXT_COLOR:
-                    return swatch.getTitleTextColor();
-                case Swatch.BODY_TEXT_COLOR:
-                    return swatch.getBodyTextColor();
-            }
-        } else {
-            Log.e(TAG, "error while generating Palette, null palette returned");
+    @Override
+    public int getColor(View view, @NonNull Palette.Swatch swatch, @Swatch int paletteSwatch) {
+        switch (paletteSwatch) {
+            case Swatch.RGB:
+                return swatch.getRgb();
+            case Swatch.TITLE_TEXT_COLOR:
+                return swatch.getTitleTextColor();
+            case Swatch.BODY_TEXT_COLOR:
+                return swatch.getBodyTextColor();
         }
         return 0;
     }
