@@ -6,6 +6,8 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.TransitionDrawable;
 import android.os.Build;
 import android.support.annotation.IntDef;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.util.Pair;
 import android.support.v7.graphics.Palette;
 import android.util.Log;
@@ -19,15 +21,17 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.WeakHashMap;
 
-/**
- * Created by florentchampigny on 16/07/15.
- */
 public abstract class BitmapPalette {
 
     private static final String TAG = "BitmapPalette";
 
     public interface CallBack {
         void onPaletteLoaded(Palette palette);
+    }
+
+    public interface PaletteBuilderInterceptor {
+        @NonNull
+        Palette.Builder intercept(Palette.Builder builder);
     }
 
     @IntDef({Profile.VIBRANT, Profile.VIBRANT_DARK, Profile.VIBRANT_LIGHT,
@@ -54,9 +58,6 @@ public abstract class BitmapPalette {
 
     protected LinkedList<PaletteTarget> targets = new LinkedList<>();
     protected ArrayList<BitmapPalette.CallBack> callbacks = new ArrayList<>();
-
-    protected BitmapPalette() {
-    }
 
     public BitmapPalette use(@Profile int paletteProfile) {
         this.targets.add(new PaletteTarget(paletteProfile));
@@ -175,6 +176,7 @@ public abstract class BitmapPalette {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
             t.first.setBackground(transitionDrawable);
         } else {
+            //noinspection deprecation
             t.first.setBackgroundDrawable(transitionDrawable);
         }
         transitionDrawable.startTransition(target.targetCrossfadeSpeed);
@@ -196,12 +198,16 @@ public abstract class BitmapPalette {
         return 0;
     }
 
-    protected void start(final Bitmap bitmap) {
+    protected void start(@NonNull final Bitmap bitmap, @Nullable PaletteBuilderInterceptor interceptor) {
         Palette palette = CACHE.get(bitmap);
         if (palette != null) {
             apply(palette, true);
         } else {
-            new Palette.Builder(bitmap).generate(new Palette.PaletteAsyncListener() {
+            Palette.Builder builder = new Palette.Builder(bitmap);
+            if (interceptor != null) {
+                builder = interceptor.intercept(builder);
+            }
+            builder.generate(new Palette.PaletteAsyncListener() {
                 @Override
                 public void onGenerated(Palette palette) {
                     CACHE.put(bitmap, palette);

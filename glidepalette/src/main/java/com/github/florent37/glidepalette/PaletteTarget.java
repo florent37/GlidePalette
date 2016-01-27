@@ -6,9 +6,6 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-/**
- * Created by florentchampigny on 11/05/15.
- */
 public class PaletteTarget {
 
     @BitmapPalette.Profile

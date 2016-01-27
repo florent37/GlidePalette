@@ -1,6 +1,7 @@
 package com.github.florent37.glidepalette;
 
 import android.graphics.Bitmap;
+import android.support.annotation.Nullable;
 import android.view.View;
 import android.widget.TextView;
 
@@ -11,10 +12,7 @@ import com.bumptech.glide.request.target.Target;
 public class GlidePalette<ModelType, TranscodeType> extends BitmapPalette implements RequestListener<ModelType, TranscodeType> {
 
     protected RequestListener<ModelType, TranscodeType> callback;
-
-    public GlidePalette() {
-
-    }
+    private PaletteBuilderInterceptor interceptor;
 
     public GlidePalette<ModelType, TranscodeType> use(@Profile int paletteProfile) {
         super.use(paletteProfile);
@@ -59,6 +57,11 @@ public class GlidePalette<ModelType, TranscodeType> extends BitmapPalette implem
         return this;
     }
 
+    public GlidePalette<ModelType, TranscodeType> setPaletteBuilderInterceptor(PaletteBuilderInterceptor interceptor) {
+        this.interceptor = interceptor;
+        return this;
+    }
+
     @Override
     public boolean onException(Exception e, ModelType model, Target<TranscodeType> target, boolean isFirstResource) {
         return this.callback != null && this.callback.onException(e, model, target, isFirstResource);
@@ -78,13 +81,14 @@ public class GlidePalette<ModelType, TranscodeType> extends BitmapPalette implem
         }
 
         if (b != null) {
-            start(b);
+            start(b, interceptor);
         }
 
         return callbackResult;
     }
 
-    interface BitmapHolder {
+    public interface BitmapHolder {
+        @Nullable
         Bitmap getBitmap();
     }
 
