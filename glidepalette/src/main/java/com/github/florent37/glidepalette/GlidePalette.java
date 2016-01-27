@@ -75,7 +75,7 @@ public class GlidePalette<ModelType, TranscodeType> extends BitmapPalette implem
         if (resource instanceof Bitmap) {
             b = (Bitmap) resource;
         } else if (resource instanceof GlideBitmapDrawable) {
-            ((GlideBitmapDrawable) resource).getBitmap();
+            b = ((GlideBitmapDrawable) resource).getBitmap();
         } else if (target instanceof BitmapHolder) {
             b = ((BitmapHolder) target).getBitmap();
         }
