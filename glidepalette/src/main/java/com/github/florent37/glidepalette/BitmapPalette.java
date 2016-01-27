@@ -57,7 +57,7 @@ public abstract class BitmapPalette implements ColorGenerator {
     private PaletteBuilderInterceptor interceptor;
     private boolean skipCache;
 
-    public BitmapPalette use(@Profile int paletteProfile) {
+    public BitmapPalette use(@Profile int... paletteProfile) {
         this.targets.add(new PaletteTarget(paletteProfile));
         return this;
     }
@@ -136,25 +136,28 @@ public abstract class BitmapPalette implements ColorGenerator {
 
         for (PaletteTarget target : targets) {
             Palette.Swatch swatch = null;
-            switch (target.paletteProfile) {
-                case Profile.VIBRANT:
-                    swatch = palette.getVibrantSwatch();
-                    break;
-                case Profile.VIBRANT_DARK:
-                    swatch = palette.getDarkVibrantSwatch();
-                    break;
-                case Profile.VIBRANT_LIGHT:
-                    swatch = palette.getLightVibrantSwatch();
-                    break;
-                case Profile.MUTED:
-                    swatch = palette.getMutedSwatch();
-                    break;
-                case Profile.MUTED_DARK:
-                    swatch = palette.getDarkMutedSwatch();
-                    break;
-                case Profile.MUTED_LIGHT:
-                    swatch = palette.getLightMutedSwatch();
-                    break;
+            for (int paletteProfile : target.paletteProfiles) {
+                switch (paletteProfile) {
+                    case Profile.VIBRANT:
+                        swatch = palette.getVibrantSwatch();
+                        break;
+                    case Profile.VIBRANT_DARK:
+                        swatch = palette.getDarkVibrantSwatch();
+                        break;
+                    case Profile.VIBRANT_LIGHT:
+                        swatch = palette.getLightVibrantSwatch();
+                        break;
+                    case Profile.MUTED:
+                        swatch = palette.getMutedSwatch();
+                        break;
+                    case Profile.MUTED_DARK:
+                        swatch = palette.getDarkMutedSwatch();
+                        break;
+                    case Profile.MUTED_LIGHT:
+                        swatch = palette.getLightMutedSwatch();
+                        break;
+                }
+                if (swatch != null) break;
             }
 
             if (swatch == null) return;

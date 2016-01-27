@@ -1,5 +1,6 @@
 package com.github.florent37.glidepalette;
 
+import android.support.annotation.NonNull;
 import android.view.View;
 import android.widget.TextView;
 
@@ -8,7 +9,7 @@ import java.util.ArrayList;
 public class PaletteTarget {
 
     @BitmapPalette.Profile
-    protected int paletteProfile = GlidePalette.Profile.VIBRANT;
+    protected int paletteProfiles[];
 
     protected ArrayList<Target> targetsBackground = new ArrayList<>();
     protected ArrayList<Target<? extends TextView, ?>> targetsText = new ArrayList<>();
@@ -17,8 +18,8 @@ public class PaletteTarget {
     protected int targetCrossfadeSpeed = DEFAULT_CROSSFADE_SPEED;
     protected static final int DEFAULT_CROSSFADE_SPEED = 300;
 
-    public PaletteTarget(@BitmapPalette.Profile int paletteProfile) {
-        this.paletteProfile = paletteProfile;
+    public PaletteTarget(@NonNull @BitmapPalette.Profile int... paletteProfiles) {
+        this.paletteProfiles = paletteProfiles;
     }
 
     public void clear() {
