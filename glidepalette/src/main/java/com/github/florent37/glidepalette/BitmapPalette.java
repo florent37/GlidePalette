@@ -1,17 +1,15 @@
 package com.github.florent37.glidepalette;
 
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.TransitionDrawable;
 import android.os.Build;
 import android.support.annotation.IntDef;
+import android.support.v4.util.LruCache;
 import android.support.v4.util.Pair;
 import android.support.v7.graphics.Palette;
 import android.util.Log;
-import android.util.LruCache;
 import android.view.View;
 import android.widget.TextView;
 
@@ -31,54 +29,49 @@ public abstract class BitmapPalette {
         void onPaletteLoaded(Palette palette);
     }
 
-    private LruCache<String, Palette> cache = new LruCache<>(40);
-
-    public static class Profile {
-        public static final int VIBRANT = 0;
-        public static final int VIBRANT_DARK = 1;
-        public static final int VIBRANT_LIGHT = 2;
-        public static final int MUTED = 3;
-        public static final int MUTED_DARK = 4;
-        public static final int MUTED_LIGHT = 5;
-
-        @IntDef({VIBRANT, VIBRANT_DARK, VIBRANT_LIGHT, MUTED, MUTED_DARK, MUTED_LIGHT})
-        @Retention(RetentionPolicy.SOURCE)
-        public @interface PaletteProfile {
-        }
+    @IntDef({Profile.VIBRANT, Profile.VIBRANT_DARK, Profile.VIBRANT_LIGHT,
+            Profile.MUTED, Profile.MUTED_DARK, Profile.MUTED_LIGHT})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface Profile {
+        int VIBRANT = 0;
+        int VIBRANT_DARK = 1;
+        int VIBRANT_LIGHT = 2;
+        int MUTED = 3;
+        int MUTED_DARK = 4;
+        int MUTED_LIGHT = 5;
     }
 
-    public static class Swatch {
-        public static final int RGB = 0;
-        public static final int TITLE_TEXT_COLOR = 1;
-        public static final int BODY_TEXT_COLOR = 2;
-
-        @IntDef({RGB, TITLE_TEXT_COLOR, BODY_TEXT_COLOR})
-        @Retention(RetentionPolicy.SOURCE)
-        public @interface PaletteSwatch {
-        }
+    @IntDef({Swatch.RGB, Swatch.TITLE_TEXT_COLOR, Swatch.BODY_TEXT_COLOR})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface Swatch {
+        int RGB = 0;
+        int TITLE_TEXT_COLOR = 1;
+        int BODY_TEXT_COLOR = 2;
     }
 
-    protected BitmapPalette() {
-    }
+    private static final LruCache<String, Palette> CACHE = new LruCache<>(40);
 
     protected String url;
 
     protected LinkedList<PaletteTarget> targets = new LinkedList<>();
     protected ArrayList<BitmapPalette.CallBack> callbacks = new ArrayList<>();
 
-    public BitmapPalette use(@Profile.PaletteProfile int paletteProfile) {
+    protected BitmapPalette() {
+    }
+
+    public BitmapPalette use(@Profile int paletteProfile) {
         this.targets.add(new PaletteTarget(paletteProfile));
         return this;
     }
 
-    protected BitmapPalette intoBackground(View view, @Swatch.PaletteSwatch int paletteSwatch) {
+    protected BitmapPalette intoBackground(View view, @Swatch int paletteSwatch) {
         assertTargetsIsNotEmpty();
 
         this.targets.getLast().targetsBackground.add(new Pair<>(view, paletteSwatch));
         return this;
     }
 
-    protected BitmapPalette intoTextColor(TextView textView, @Swatch.PaletteSwatch int paletteSwatch) {
+    protected BitmapPalette intoTextColor(TextView textView, @Swatch int paletteSwatch) {
         assertTargetsIsNotEmpty();
 
         this.targets.getLast().targetsText.add(new Pair<>(textView, paletteSwatch));
@@ -101,7 +94,7 @@ public abstract class BitmapPalette {
 
     private void assertTargetsIsNotEmpty() {
         if (this.targets.isEmpty()) {
-            throw new UnsupportedOperationException("You must specify a palette with use(Profile.PaletteProfile)");
+            throw new UnsupportedOperationException("You must specify a palette with use(Profile.Profile)");
         }
     }
 
@@ -114,7 +107,14 @@ public abstract class BitmapPalette {
 
     //region apply
 
-    protected void apply(Palette palette) {
+    /**
+     * Apply the Palette Profile & Swatch to our current targets
+     *
+     * @param palette  the palette to apply
+     * @param cacheHit true if the palette was retrieved from the cache, else false
+     */
+    protected void apply(Palette palette, boolean cacheHit) {
+
         for (CallBack c : callbacks) {
             c.onPaletteLoaded(palette);
         }
@@ -145,7 +145,8 @@ public abstract class BitmapPalette {
             if (swatch != null) {
                 for (Pair<View, Integer> t : target.targetsBackground) {
                     int color = getColor(swatch, t.second);
-                    if (target.targetCrossfade) {
+                    //Only crossfade if we're not coming from a cache hit.
+                    if (!cacheHit && target.targetCrossfade) {
                         crossfadeTargetBackground(target, t, color);
                     } else {
                         t.first.setBackgroundColor(color);
@@ -164,16 +165,12 @@ public abstract class BitmapPalette {
     }
 
     private void crossfadeTargetBackground(PaletteTarget target, Pair<View, Integer> t, int newColor) {
-        final Bitmap next = Bitmap.createBitmap(t.first.getWidth(), t.first.getHeight(), Bitmap.Config.ARGB_8888);
-        final Canvas canvas = new Canvas(next);
-        canvas.drawColor(newColor);
 
         final Drawable oldColor = t.first.getBackground();
-        final BitmapDrawable newBackground = new BitmapDrawable(t.first.getResources(), next);
         final Drawable[] drawables = new Drawable[2];
 
         drawables[0] = oldColor != null ? oldColor : new ColorDrawable(t.first.getSolidColor());
-        drawables[1] = newBackground;
+        drawables[1] = new ColorDrawable(newColor);
         TransitionDrawable transitionDrawable = new TransitionDrawable(drawables);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
@@ -184,7 +181,7 @@ public abstract class BitmapPalette {
         transitionDrawable.startTransition(target.targetCrossfadeSpeed);
     }
 
-    protected static int getColor(Palette.Swatch swatch, @Swatch.PaletteSwatch int paletteSwatch) {
+    protected static int getColor(Palette.Swatch swatch, @Swatch int paletteSwatch) {
         if (swatch != null) {
             switch (paletteSwatch) {
                 case Swatch.RGB:
@@ -200,15 +197,16 @@ public abstract class BitmapPalette {
         return 0;
     }
 
-    protected void start(Bitmap bitmap) {
-        if (cache.get(url) != null) {
-            BitmapPalette.this.apply(cache.get(url));
+    protected void start(final Bitmap bitmap) {
+        Palette palette = CACHE.get(url);
+        if (palette != null) {
+            apply(palette, true);
         } else {
             new Palette.Builder(bitmap).generate(new Palette.PaletteAsyncListener() {
                 @Override
                 public void onGenerated(Palette palette) {
-                    cache.put(url, palette);
-                    BitmapPalette.this.apply(palette);
+                    CACHE.put(url, palette);
+                    apply(palette, false);
                 }
             });
         }
