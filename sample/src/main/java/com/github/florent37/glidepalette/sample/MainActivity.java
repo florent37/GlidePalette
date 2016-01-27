@@ -38,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
                 .centerCrop()
                 .listener(new GlidePalette<String, GlideDrawable>()
                         .use(GlidePalette.Profile.VIBRANT)
+
                         .intoBackground(textVibrant, GlidePalette.Swatch.RGB)
                         .intoTextColor(textVibrant, GlidePalette.Swatch.BODY_TEXT_COLOR)
                         .crossfade(true)
@@ -53,6 +54,7 @@ public class MainActivity extends AppCompatActivity {
                         .use(GlidePalette.Profile.MUTED)
                         .intoBackground(textMuted, GlidePalette.Swatch.RGB)
                         .intoTextColor(textMuted, GlidePalette.Swatch.BODY_TEXT_COLOR)
+
                         .use(GlidePalette.Profile.MUTED_DARK)
                         .intoBackground(textMutedDark, GlidePalette.Swatch.RGB)
                         .intoTextColor(textMutedDark, GlidePalette.Swatch.BODY_TEXT_COLOR)

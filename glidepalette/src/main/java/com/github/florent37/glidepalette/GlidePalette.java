@@ -87,6 +87,12 @@ public class GlidePalette<ModelType, TranscodeType> extends BitmapPalette implem
     }
 
     @Override
+    public GlidePalette<ModelType, TranscodeType> colorGenerator(ColorGenerator colorGenerator) {
+        super.colorGenerator(colorGenerator);
+        return this;
+    }
+
+    @Override
     public boolean onException(Exception e, ModelType model, Target<TranscodeType> target, boolean isFirstResource) {
         return this.callback != null && this.callback.onException(e, model, target, isFirstResource);
     }

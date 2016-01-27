@@ -55,6 +55,7 @@ public abstract class BitmapPalette implements ColorGenerator {
     protected LinkedList<PaletteTarget> targets = new LinkedList<>();
     protected ArrayList<BitmapPalette.CallBack> callbacks = new ArrayList<>();
     private PaletteBuilderInterceptor interceptor;
+    private ColorGenerator colorGenerator;
     private boolean skipCache;
 
     public BitmapPalette use(@Profile int... paletteProfile) {
@@ -70,7 +71,7 @@ public abstract class BitmapPalette implements ColorGenerator {
     }
 
     protected BitmapPalette intoBackground(View view, @Swatch int paletteSwatch) {
-        return intoBackground(view, paletteSwatch, this);
+        return intoBackground(view, paletteSwatch, colorGenerator != null ? colorGenerator : this);
     }
 
     protected BitmapPalette intoTextColor(TextView textView, @Swatch int paletteSwatch, ColorGenerator generator) {
@@ -81,7 +82,7 @@ public abstract class BitmapPalette implements ColorGenerator {
     }
 
     protected BitmapPalette intoTextColor(TextView textView, @Swatch int paletteSwatch) {
-        return intoTextColor(textView, paletteSwatch, this);
+        return intoTextColor(textView, paletteSwatch, colorGenerator != null ? colorGenerator : this);
     }
 
     protected BitmapPalette crossfade(boolean crossfade) {
@@ -117,6 +118,11 @@ public abstract class BitmapPalette implements ColorGenerator {
 
     protected BitmapPalette setPaletteBuilderInterceptor(PaletteBuilderInterceptor interceptor) {
         this.interceptor = interceptor;
+        return this;
+    }
+
+    protected BitmapPalette colorGenerator(ColorGenerator colorGenerator) {
+        this.colorGenerator = colorGenerator;
         return this;
     }
 
