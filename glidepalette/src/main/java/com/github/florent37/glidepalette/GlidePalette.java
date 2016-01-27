@@ -12,8 +12,8 @@ import com.bumptech.glide.request.target.Target;
 public class GlidePalette<ModelType, TranscodeType> extends BitmapPalette implements RequestListener<ModelType, TranscodeType> {
 
     protected RequestListener<ModelType, TranscodeType> callback;
-    private PaletteBuilderInterceptor interceptor;
 
+    @Override
     public GlidePalette<ModelType, TranscodeType> use(@Profile int paletteProfile) {
         super.use(paletteProfile);
         return this;
@@ -23,6 +23,7 @@ public class GlidePalette<ModelType, TranscodeType> extends BitmapPalette implem
         return this.intoBackground(view, Swatch.RGB);
     }
 
+    @Override
     public GlidePalette<ModelType, TranscodeType> intoBackground(View view, @Swatch int paletteSwatch) {
         super.intoBackground(view, paletteSwatch);
         return this;
@@ -32,16 +33,19 @@ public class GlidePalette<ModelType, TranscodeType> extends BitmapPalette implem
         return this.intoTextColor(textView, Swatch.TITLE_TEXT_COLOR);
     }
 
+    @Override
     public GlidePalette<ModelType, TranscodeType> intoTextColor(TextView textView, @Swatch int paletteSwatch) {
         super.intoTextColor(textView, paletteSwatch);
         return this;
     }
 
+    @Override
     public GlidePalette<ModelType, TranscodeType> crossfade(boolean crossfade) {
         super.crossfade(crossfade);
         return this;
     }
 
+    @Override
     public GlidePalette<ModelType, TranscodeType> crossfade(boolean crossfade, int crossfadeSpeed) {
         super.crossfade(crossfade, crossfadeSpeed);
         return this;
@@ -52,13 +56,21 @@ public class GlidePalette<ModelType, TranscodeType> extends BitmapPalette implem
         return this;
     }
 
+    @Override
     public GlidePalette<ModelType, TranscodeType> intoCallBack(GlidePalette.CallBack callBack) {
         super.intoCallBack(callBack);
         return this;
     }
 
+    @Override
     public GlidePalette<ModelType, TranscodeType> setPaletteBuilderInterceptor(PaletteBuilderInterceptor interceptor) {
-        this.interceptor = interceptor;
+        super.setPaletteBuilderInterceptor(interceptor);
+        return this;
+    }
+
+    @Override
+    public GlidePalette<ModelType, TranscodeType> skipPaletteCache(boolean skipCache) {
+        super.skipPaletteCache(skipCache);
         return this;
     }
 
@@ -81,7 +93,7 @@ public class GlidePalette<ModelType, TranscodeType> extends BitmapPalette implem
         }
 
         if (b != null) {
-            start(b, interceptor);
+            start(b);
         }
 
         return callbackResult;

@@ -26,7 +26,7 @@ public abstract class BitmapPalette {
     private static final String TAG = "BitmapPalette";
 
     public interface CallBack {
-        void onPaletteLoaded(Palette palette);
+        void onPaletteLoaded(@Nullable Palette palette);
     }
 
     public interface PaletteBuilderInterceptor {
@@ -58,6 +58,8 @@ public abstract class BitmapPalette {
 
     protected LinkedList<PaletteTarget> targets = new LinkedList<>();
     protected ArrayList<BitmapPalette.CallBack> callbacks = new ArrayList<>();
+    private PaletteBuilderInterceptor interceptor;
+    private boolean skipCache;
 
     public BitmapPalette use(@Profile int paletteProfile) {
         this.targets.add(new PaletteTarget(paletteProfile));
@@ -104,8 +106,15 @@ public abstract class BitmapPalette {
         return this;
     }
 
+    protected BitmapPalette skipPaletteCache(boolean skipCache) {
+        this.skipCache = skipCache;
+        return this;
+    }
 
-    //region apply
+    protected BitmapPalette setPaletteBuilderInterceptor(PaletteBuilderInterceptor interceptor) {
+        this.interceptor = interceptor;
+        return this;
+    }
 
     /**
      * Apply the Palette Profile & Swatch to our current targets
@@ -118,6 +127,8 @@ public abstract class BitmapPalette {
         for (CallBack c : callbacks) {
             c.onPaletteLoaded(palette);
         }
+
+        if (palette == null) return;
 
         for (PaletteTarget target : targets) {
             Palette.Swatch swatch = null;
@@ -142,25 +153,25 @@ public abstract class BitmapPalette {
                     break;
             }
 
-            if (swatch != null) {
-                for (Pair<View, Integer> t : target.targetsBackground) {
-                    int color = getColor(swatch, t.second);
-                    //Only crossfade if we're not coming from a cache hit.
-                    if (!cacheHit && target.targetCrossfade) {
-                        crossfadeTargetBackground(target, t, color);
-                    } else {
-                        t.first.setBackgroundColor(color);
-                    }
-                }
+            if (swatch == null) return;
 
-                for (Pair<TextView, Integer> t : target.targetsText) {
-                    int color = getColor(swatch, t.second);
-                    t.first.setTextColor(color);
+            for (Pair<View, Integer> t : target.targetsBackground) {
+                int color = getColor(swatch, t.second);
+                //Only crossfade if we're not coming from a cache hit.
+                if (!cacheHit && target.targetCrossfade) {
+                    crossfadeTargetBackground(target, t, color);
+                } else {
+                    t.first.setBackgroundColor(color);
                 }
-
-                target.clear();
-                this.callbacks = null;
             }
+
+            for (Pair<TextView, Integer> t : target.targetsText) {
+                int color = getColor(swatch, t.second);
+                t.first.setTextColor(color);
+            }
+
+            target.clear();
+            this.callbacks = null;
         }
     }
 
@@ -198,22 +209,27 @@ public abstract class BitmapPalette {
         return 0;
     }
 
-    protected void start(@NonNull final Bitmap bitmap, @Nullable PaletteBuilderInterceptor interceptor) {
-        Palette palette = CACHE.get(bitmap);
-        if (palette != null) {
-            apply(palette, true);
-        } else {
-            Palette.Builder builder = new Palette.Builder(bitmap);
-            if (interceptor != null) {
-                builder = interceptor.intercept(builder);
+    protected void start(@NonNull final Bitmap bitmap) {
+        final boolean skipCache = this.skipCache;
+        if (!skipCache) {
+            Palette palette = CACHE.get(bitmap);
+            if (palette != null) {
+                apply(palette, true);
+                return;
             }
-            builder.generate(new Palette.PaletteAsyncListener() {
-                @Override
-                public void onGenerated(Palette palette) {
-                    CACHE.put(bitmap, palette);
-                    apply(palette, false);
-                }
-            });
         }
+        Palette.Builder builder = new Palette.Builder(bitmap);
+        if (interceptor != null) {
+            builder = interceptor.intercept(builder);
+        }
+        builder.generate(new Palette.PaletteAsyncListener() {
+            @Override
+            public void onGenerated(Palette palette) {
+                if (!skipCache) {
+                    CACHE.put(bitmap, palette);
+                }
+                apply(palette, false);
+            }
+        });
     }
 }

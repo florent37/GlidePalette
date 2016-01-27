@@ -2,12 +2,14 @@ package com.github.florent37.glidepalette.sample;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
@@ -32,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
         TextView textMutedDark = (TextView) findViewById(R.id.textMutedDark);
 
         Glide.with(this).load(URL)
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .centerCrop()
                 .listener(new GlidePalette<String, GlideDrawable>()
                         .use(GlidePalette.Profile.VIBRANT)
@@ -59,9 +62,9 @@ public class MainActivity extends AppCompatActivity {
                         .intoTextColor(textMutedLight, GlidePalette.Swatch.BODY_TEXT_COLOR)
 
                         // optional
-                        .intoCallBack(new GlidePalette.CallBack() {
+                        .intoCallBack(new BitmapPalette.CallBack() {
                             @Override
-                            public void onPaletteLoaded(Palette palette) {
+                            public void onPaletteLoaded(@Nullable Palette palette) {
                                 //specific task
                             }
                         })
@@ -84,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
                             @NonNull
                             @Override
                             public Palette.Builder intercept(Palette.Builder builder) {
-                                return builder;
+                                return builder.resizeBitmapSize(100);
                             }
                         })
                 )
