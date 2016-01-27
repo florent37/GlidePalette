@@ -6,6 +6,7 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.TransitionDrawable;
 import android.os.Build;
 import android.support.annotation.IntDef;
+import android.support.v4.util.LruCache;
 import android.support.v4.util.Pair;
 import android.support.v7.graphics.Palette;
 import android.util.Log;
@@ -16,8 +17,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.Map;
-import java.util.WeakHashMap;
 
 /**
  * Created by florentchampigny on 16/07/15.
@@ -50,7 +49,7 @@ public abstract class BitmapPalette {
         int BODY_TEXT_COLOR = 2;
     }
 
-    private static final Map<Bitmap, Palette> CACHE = new WeakHashMap<>();
+    private static final LruCache<String, Palette> CACHE = new LruCache<>(40);
 
     protected String url;
 
@@ -199,14 +198,14 @@ public abstract class BitmapPalette {
     }
 
     protected void start(final Bitmap bitmap) {
-        Palette palette = CACHE.get(bitmap);
+        Palette palette = CACHE.get(url);
         if (palette != null) {
             apply(palette, true);
         } else {
             new Palette.Builder(bitmap).generate(new Palette.PaletteAsyncListener() {
                 @Override
                 public void onGenerated(Palette palette) {
-                    CACHE.put(bitmap, palette);
+                    CACHE.put(url, palette);
                     apply(palette, false);
                 }
             });
