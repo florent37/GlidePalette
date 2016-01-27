@@ -15,8 +15,13 @@ public class GlidePalette<ModelType> extends BitmapPalette implements RequestLis
 
     protected RequestListener<ModelType, GlideDrawable> callback;
 
-    public GlidePalette() {
+    protected GlidePalette() {
+    }
 
+    public static GlidePalette with(String url) {
+        GlidePalette glidePalette = new GlidePalette();
+        glidePalette.url = url;
+        return glidePalette;
     }
 
     public GlidePalette use(@Profile int paletteProfile) {

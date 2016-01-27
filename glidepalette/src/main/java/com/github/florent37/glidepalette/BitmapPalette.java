@@ -52,6 +52,8 @@ public abstract class BitmapPalette {
 
     private static final Map<Bitmap, Palette> CACHE = new WeakHashMap<>();
 
+    protected String url;
+
     protected LinkedList<PaletteTarget> targets = new LinkedList<>();
     protected ArrayList<BitmapPalette.CallBack> callbacks = new ArrayList<>();
 
