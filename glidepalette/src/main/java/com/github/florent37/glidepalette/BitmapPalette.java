@@ -116,11 +116,11 @@ public abstract class BitmapPalette {
         return this;
     }
 
-    /**
+    /*
      * Apply the Palette Profile & Swatch to our current targets
      *
-     * @param palette  the palette to apply
-     * @param cacheHit true if the palette was retrieved from the cache, else false
+     * palette  the palette to apply
+     * cacheHit true if the palette was retrieved from the cache, else false
      */
     protected void apply(Palette palette, boolean cacheHit) {
 
