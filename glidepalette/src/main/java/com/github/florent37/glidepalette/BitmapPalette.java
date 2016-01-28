@@ -8,7 +8,10 @@ import android.os.Build;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.util.LruCache;
+import android.support.v4.util.Pair;
 import android.support.v7.graphics.Palette;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -50,7 +53,9 @@ public abstract class BitmapPalette implements ColorGenerator {
         int BODY_TEXT_COLOR = 2;
     }
 
-    private static final Map<Bitmap, Palette> CACHE = new WeakHashMap<>();
+    private static final LruCache<String, Palette> CACHE = new LruCache<>(40);
+
+    protected String url;
 
     protected LinkedList<PaletteTarget> targets = new LinkedList<>();
     protected ArrayList<BitmapPalette.CallBack> callbacks = new ArrayList<>();
@@ -222,7 +227,7 @@ public abstract class BitmapPalette implements ColorGenerator {
     protected void start(@NonNull final Bitmap bitmap) {
         final boolean skipCache = this.skipCache;
         if (!skipCache) {
-            Palette palette = CACHE.get(bitmap);
+            Palette palette = CACHE.get(url);
             if (palette != null) {
                 apply(palette, true);
                 return;
@@ -236,7 +241,7 @@ public abstract class BitmapPalette implements ColorGenerator {
             @Override
             public void onGenerated(Palette palette) {
                 if (!skipCache) {
-                    CACHE.put(bitmap, palette);
+                    CACHE.put(url, palette);
                 }
                 apply(palette, false);
             }

@@ -36,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
         Glide.with(this).load(URL)
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .centerCrop()
-                .listener(new GlidePalette<String, GlideDrawable>()
+                .listener(GlidePalette.with(URL)
                         .use(GlidePalette.Profile.VIBRANT)
 
                         .intoBackground(textVibrant, GlidePalette.Swatch.RGB)
