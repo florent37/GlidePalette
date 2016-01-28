@@ -13,8 +13,6 @@ public class GlidePalette<ModelType, TranscodeType> extends BitmapPalette implem
 
     protected RequestListener<ModelType, TranscodeType> callback;
 
-    @Override
-    public GlidePalette<ModelType, TranscodeType> use(@Profile int... paletteProfile) {
     protected GlidePalette() {
     }
 
@@ -24,7 +22,8 @@ public class GlidePalette<ModelType, TranscodeType> extends BitmapPalette implem
         return glidePalette;
     }
 
-    public GlidePalette use(@Profile int paletteProfile) {
+    @Override
+    public GlidePalette<ModelType, TranscodeType> use(@Profile int... paletteProfile) {
         super.use(paletteProfile);
         return this;
     }
