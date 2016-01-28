@@ -6,12 +6,9 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-/**
- * Created by florentchampigny on 11/05/15.
- */
 public class PaletteTarget {
 
-    @BitmapPalette.Profile.PaletteProfile
+    @BitmapPalette.Profile
     protected int paletteProfile = GlidePalette.Profile.VIBRANT;
 
     protected ArrayList<Pair<View, Integer>> targetsBackground = new ArrayList<>();
@@ -21,7 +18,7 @@ public class PaletteTarget {
     protected int targetCrossfadeSpeed = DEFAULT_CROSSFADE_SPEED;
     protected static final int DEFAULT_CROSSFADE_SPEED = 300;
 
-    public PaletteTarget(@BitmapPalette.Profile.PaletteProfile int paletteProfile) {
+    public PaletteTarget(@BitmapPalette.Profile int paletteProfile) {
         this.paletteProfile = paletteProfile;
     }
 
