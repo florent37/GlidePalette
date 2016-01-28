@@ -19,10 +19,10 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.Map;
+import java.util.WeakHashMap;
 
-public abstract class BitmapPalette {
-
-    private static final String TAG = "BitmapPalette";
+public abstract class BitmapPalette implements ColorGenerator {
 
     public interface CallBack {
         void onPaletteLoaded(@Nullable Palette palette);
@@ -60,25 +60,34 @@ public abstract class BitmapPalette {
     protected LinkedList<PaletteTarget> targets = new LinkedList<>();
     protected ArrayList<BitmapPalette.CallBack> callbacks = new ArrayList<>();
     private PaletteBuilderInterceptor interceptor;
+    private ColorGenerator colorGenerator;
     private boolean skipCache;
 
-    public BitmapPalette use(@Profile int paletteProfile) {
+    public BitmapPalette use(@Profile int... paletteProfile) {
         this.targets.add(new PaletteTarget(paletteProfile));
         return this;
     }
 
-    protected BitmapPalette intoBackground(View view, @Swatch int paletteSwatch) {
+    protected BitmapPalette intoBackground(View view, @Swatch int paletteSwatch, ColorGenerator generator) {
         assertTargetsIsNotEmpty();
 
-        this.targets.getLast().targetsBackground.add(new Pair<>(view, paletteSwatch));
+        this.targets.getLast().targetsBackground.add(new PaletteTarget.Target<>(view, paletteSwatch, generator));
+        return this;
+    }
+
+    protected BitmapPalette intoBackground(View view, @Swatch int paletteSwatch) {
+        return intoBackground(view, paletteSwatch, colorGenerator != null ? colorGenerator : this);
+    }
+
+    protected BitmapPalette intoTextColor(TextView textView, @Swatch int paletteSwatch, ColorGenerator generator) {
+        assertTargetsIsNotEmpty();
+
+        this.targets.getLast().targetsText.add(new PaletteTarget.Target<>(textView, paletteSwatch, generator));
         return this;
     }
 
     protected BitmapPalette intoTextColor(TextView textView, @Swatch int paletteSwatch) {
-        assertTargetsIsNotEmpty();
-
-        this.targets.getLast().targetsText.add(new Pair<>(textView, paletteSwatch));
-        return this;
+        return intoTextColor(textView, paletteSwatch, colorGenerator != null ? colorGenerator : this);
     }
 
     protected BitmapPalette crossfade(boolean crossfade) {
@@ -117,11 +126,16 @@ public abstract class BitmapPalette {
         return this;
     }
 
-    /*
+    protected BitmapPalette colorGenerator(ColorGenerator colorGenerator) {
+        this.colorGenerator = colorGenerator;
+        return this;
+    }
+
+    /**
      * Apply the Palette Profile & Swatch to our current targets
      *
-     * palette  the palette to apply
-     * cacheHit true if the palette was retrieved from the cache, else false
+     * @param palette  the palette to apply
+     * @param cacheHit true if the palette was retrieved from the cache, else false
      */
     protected void apply(Palette palette, boolean cacheHit) {
 
@@ -133,42 +147,45 @@ public abstract class BitmapPalette {
 
         for (PaletteTarget target : targets) {
             Palette.Swatch swatch = null;
-            switch (target.paletteProfile) {
-                case Profile.VIBRANT:
-                    swatch = palette.getVibrantSwatch();
-                    break;
-                case Profile.VIBRANT_DARK:
-                    swatch = palette.getDarkVibrantSwatch();
-                    break;
-                case Profile.VIBRANT_LIGHT:
-                    swatch = palette.getLightVibrantSwatch();
-                    break;
-                case Profile.MUTED:
-                    swatch = palette.getMutedSwatch();
-                    break;
-                case Profile.MUTED_DARK:
-                    swatch = palette.getDarkMutedSwatch();
-                    break;
-                case Profile.MUTED_LIGHT:
-                    swatch = palette.getLightMutedSwatch();
-                    break;
+            for (int paletteProfile : target.paletteProfiles) {
+                switch (paletteProfile) {
+                    case Profile.VIBRANT:
+                        swatch = palette.getVibrantSwatch();
+                        break;
+                    case Profile.VIBRANT_DARK:
+                        swatch = palette.getDarkVibrantSwatch();
+                        break;
+                    case Profile.VIBRANT_LIGHT:
+                        swatch = palette.getLightVibrantSwatch();
+                        break;
+                    case Profile.MUTED:
+                        swatch = palette.getMutedSwatch();
+                        break;
+                    case Profile.MUTED_DARK:
+                        swatch = palette.getDarkMutedSwatch();
+                        break;
+                    case Profile.MUTED_LIGHT:
+                        swatch = palette.getLightMutedSwatch();
+                        break;
+                }
+                if (swatch != null) break;
             }
 
             if (swatch == null) return;
 
-            for (Pair<View, Integer> t : target.targetsBackground) {
-                int color = getColor(swatch, t.second);
+            for (PaletteTarget.Target t : target.targetsBackground) {
+                int color = t.generator.getColor(t.view, swatch, t.paletteSwatch);
                 //Only crossfade if we're not coming from a cache hit.
                 if (!cacheHit && target.targetCrossfade) {
-                    crossfadeTargetBackground(target, t, color);
+                    crossfadeTargetBackground(target, t.view, color);
                 } else {
-                    t.first.setBackgroundColor(color);
+                    t.view.setBackgroundColor(color);
                 }
             }
 
-            for (Pair<TextView, Integer> t : target.targetsText) {
-                int color = getColor(swatch, t.second);
-                t.first.setTextColor(color);
+            for (PaletteTarget.Target<? extends TextView, ?> t : target.targetsText) {
+                int color = t.generator.getColor(t.view, swatch, t.paletteSwatch);
+                t.view.setTextColor(color);
             }
 
             target.clear();
@@ -176,36 +193,33 @@ public abstract class BitmapPalette {
         }
     }
 
-    private void crossfadeTargetBackground(PaletteTarget target, Pair<View, Integer> t, int newColor) {
+    private void crossfadeTargetBackground(@NonNull PaletteTarget target, @NonNull View view, int newColor) {
 
-        final Drawable oldColor = t.first.getBackground();
+        final Drawable oldColor = view.getBackground();
         final Drawable[] drawables = new Drawable[2];
 
-        drawables[0] = oldColor != null ? oldColor : new ColorDrawable(t.first.getSolidColor());
+        drawables[0] = oldColor != null ? oldColor : new ColorDrawable(view.getSolidColor());
         drawables[1] = new ColorDrawable(newColor);
         TransitionDrawable transitionDrawable = new TransitionDrawable(drawables);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-            t.first.setBackground(transitionDrawable);
+            view.setBackground(transitionDrawable);
         } else {
             //noinspection deprecation
-            t.first.setBackgroundDrawable(transitionDrawable);
+            view.setBackgroundDrawable(transitionDrawable);
         }
         transitionDrawable.startTransition(target.targetCrossfadeSpeed);
     }
 
-    protected static int getColor(Palette.Swatch swatch, @Swatch int paletteSwatch) {
-        if (swatch != null) {
-            switch (paletteSwatch) {
-                case Swatch.RGB:
-                    return swatch.getRgb();
-                case Swatch.TITLE_TEXT_COLOR:
-                    return swatch.getTitleTextColor();
-                case Swatch.BODY_TEXT_COLOR:
-                    return swatch.getBodyTextColor();
-            }
-        } else {
-            Log.e(TAG, "error while generating Palette, null palette returned");
+    @Override
+    public int getColor(View view, @NonNull Palette.Swatch swatch, @Swatch int paletteSwatch) {
+        switch (paletteSwatch) {
+            case Swatch.RGB:
+                return swatch.getRgb();
+            case Swatch.TITLE_TEXT_COLOR:
+                return swatch.getTitleTextColor();
+            case Swatch.BODY_TEXT_COLOR:
+                return swatch.getBodyTextColor();
         }
         return 0;
     }

@@ -22,7 +22,8 @@ public class GlidePalette<ModelType, TranscodeType> extends BitmapPalette implem
         return glidePalette;
     }
 
-    public GlidePalette use(@Profile int paletteProfile) {
+    @Override
+    public GlidePalette<ModelType, TranscodeType> use(@Profile int... paletteProfile) {
         super.use(paletteProfile);
         return this;
     }
@@ -37,6 +38,12 @@ public class GlidePalette<ModelType, TranscodeType> extends BitmapPalette implem
         return this;
     }
 
+    @Override
+    public GlidePalette<ModelType, TranscodeType> intoBackground(View view, @Swatch int paletteSwatch, ColorGenerator generator) {
+        super.intoBackground(view, paletteSwatch, generator);
+        return this;
+    }
+
     public GlidePalette<ModelType, TranscodeType> intoTextColor(TextView textView) {
         return this.intoTextColor(textView, Swatch.TITLE_TEXT_COLOR);
     }
@@ -44,6 +51,12 @@ public class GlidePalette<ModelType, TranscodeType> extends BitmapPalette implem
     @Override
     public GlidePalette<ModelType, TranscodeType> intoTextColor(TextView textView, @Swatch int paletteSwatch) {
         super.intoTextColor(textView, paletteSwatch);
+        return this;
+    }
+
+    @Override
+    public GlidePalette<ModelType, TranscodeType> intoTextColor(TextView textView, @Swatch int paletteSwatch, ColorGenerator generator) {
+        super.intoTextColor(textView, paletteSwatch, generator);
         return this;
     }
 
@@ -79,6 +92,12 @@ public class GlidePalette<ModelType, TranscodeType> extends BitmapPalette implem
     @Override
     public GlidePalette<ModelType, TranscodeType> skipPaletteCache(boolean skipCache) {
         super.skipPaletteCache(skipCache);
+        return this;
+    }
+
+    @Override
+    public GlidePalette<ModelType, TranscodeType> colorGenerator(ColorGenerator colorGenerator) {
+        super.colorGenerator(colorGenerator);
         return this;
     }
 
