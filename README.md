@@ -7,7 +7,9 @@ GlidePalette
 
 In your module [![Download](https://api.bintray.com/packages/florent37/maven/GlidePalette/images/download.svg)](https://bintray.com/florent37/maven/GlidePalette/_latestVersion)
 ```groovy
-compile 'com.github.florent37:glidepalette:1.0.6'
+compile 'com.github.florent37:glidepalette:2.0.0'
+
+compile 'com.github.bumptech.glide:glide:4.0.0-SNAPSHOT'
 ```
 
 #Sample
