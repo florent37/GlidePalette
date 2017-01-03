@@ -21,7 +21,7 @@ import com.github.florent37.glidepalette.GlidePalette;
 
 public class MainActivity extends AppCompatActivity {
 
-	public static final String URL = "https://www.lepetiterudit.com/wp-content/uploads/2015/04/starry-night.jpg";
+	public static final String URL = "http://i.huffpost.com/gen/2299606/images/n-STARRY-NIGHT-628x314.jpg";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
