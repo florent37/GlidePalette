@@ -1,28 +1,22 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion project.COMPILE_SDK
-    buildToolsVersion project.BUILD_TOOL
+    compileSdkVersion project.sdk
+    buildToolsVersion project.buildTools
 
     defaultConfig {
+        minSdkVersion project.minSdk
+        targetSdkVersion project.sdk
         applicationId "com.github.florent37.glidepalette"
-        minSdkVersion project.minSdkVersion
-        targetSdkVersion project.TARGET_SDK
         versionCode 1
         versionName "1.0"
-    }
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
     }
 }
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:appcompat-v7:23.2.0'
-    compile 'com.github.bumptech.glide:glide:4.0.0-SNAPSHOT'
+    compile 'com.android.support:appcompat-v7:'+project.supportVersion
+    compile 'com.github.bumptech.glide:glide:4.0.0-RC1'
 
     compile project(":glidepalette")
 }

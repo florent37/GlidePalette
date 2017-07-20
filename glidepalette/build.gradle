@@ -1,34 +1,23 @@
 apply plugin: 'com.android.library'
-apply plugin: 'com.github.dcendents.android-maven'
-apply plugin: 'com.jfrog.bintray'
-
 
 android {
-    compileSdkVersion project.COMPILE_SDK
-    buildToolsVersion project.BUILD_TOOL
+    compileSdkVersion project.sdk
+    buildToolsVersion project.buildTools
 
     defaultConfig {
-        minSdkVersion project.minSdkVersion
-        targetSdkVersion project.TARGET_SDK
+        minSdkVersion project.minSdk
+        targetSdkVersion project.sdk
 
         versionCode 1
         versionName "1.0"
     }
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
-    }
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:palette-v7:23.3.0'
-    compile 'com.android.support:support-v4:23.3.0'
-    compile 'com.github.bumptech.glide:glide:4.0.0-SNAPSHOT'
+    compile 'com.android.support:palette-v7:' + project.supportVersion
+    compile 'com.android.support:support-v4:' + project.supportVersion
+    compile 'com.github.bumptech.glide:glide:4.0.0-RC1'
 }
-
 
 ext {
     bintrayRepo = 'maven'
@@ -55,8 +44,5 @@ ext {
     allLicenses = ["Apache-2.0"]
 }
 
-
-if (project.rootProject.file('local.properties').exists()) {
-    apply from: rootProject.file('gradle/install-v1.gradle')
-    apply from: rootProject.file('gradle/bintray-android-v1.gradle')
-}
+apply from: rootProject.file('gradle/install-v1.gradle')
+apply from: rootProject.file('gradle/bintray-android-v1.gradle')

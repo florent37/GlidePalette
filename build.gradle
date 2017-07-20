@@ -3,14 +3,11 @@
 buildscript {
     repositories {
         jcenter()
-        maven {
-            url "http://dl.bintray.com/jfrog/jfrog-jars"
-        }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.2.3'
+        classpath 'com.android.tools.build:gradle:2.3.3'
         classpath 'com.github.dcendents:android-maven-gradle-plugin:1.4.1'
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.0'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
 
         classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
         // NOTE: Do not place your application dependencies here; they belong
@@ -18,25 +15,20 @@ buildscript {
     }
 }
 
-ext{
-    COMPILE_SDK=24
-    TARGET_SDK=24
-    BUILD_TOOL="24.0.2"
-    minSdkVersion = 14
-    sourceCompatibilityVersion = JavaVersion.VERSION_1_7
-    targetCompatibilityVersion = JavaVersion.VERSION_1_7
-
-    libraryVersion="2.0.1"
-}
-
 allprojects {
     repositories {
         jcenter()
-        maven {
-            url "http://dl.bintray.com/florent37/maven"
-        }
-        maven {
-            url "https://oss.sonatype.org/content/repositories/snapshots"
-        }
     }
+}
+
+ext {
+    sdk = 25
+    buildTools = "25.0.0" //keep 25.0.0 for Continuous Integration
+    minSdk = 14
+    libraryVersion = "2.1.0"
+    supportVersion = "25.3.1"
+
+    sourceCompatibilityVersion = JavaVersion.VERSION_1_7
+    targetCompatibilityVersion = JavaVersion.VERSION_1_7
+
 }
