@@ -5,11 +5,13 @@ GlidePalette
 
 # Download
 
+<a href='https://ko-fi.com/A160LCC' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://az743702.vo.msecnd.net/cdn/kofi1.png?v=0' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
+
 In your module [![Download](https://api.bintray.com/packages/florent37/maven/GlidePalette/images/download.svg)](https://bintray.com/florent37/maven/GlidePalette/_latestVersion)
 ```groovy
 compile 'com.github.florent37:glidepalette:2.1.0'
-c
-ompile 'com.github.bumptech.glide:glide:4.0.0-RC1'
+
+compile 'com.github.bumptech.glide:glide:4.0.0-RC1'
 ```
 
 # Sample
