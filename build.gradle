@@ -25,7 +25,7 @@ ext {
     sdk = 25
     buildTools = "25.0.0" //keep 25.0.0 for Continuous Integration
     minSdk = 14
-    libraryVersion = "2.1.0"
+    libraryVersion = "2.1.1"
     supportVersion = "25.3.1"
 
     sourceCompatibilityVersion = JavaVersion.VERSION_1_7

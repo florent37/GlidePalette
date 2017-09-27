@@ -19,14 +19,14 @@ import com.bumptech.glide.request.target.Target;
 import com.github.florent37.glidepalette.BitmapPalette;
 import com.github.florent37.glidepalette.GlidePalette;
 
-public class MainActivity extends AppCompatActivity {
+public class GlidePaletteMainActivity extends AppCompatActivity {
 
 	public static final String URL = "http://i.huffpost.com/gen/2299606/images/n-STARRY-NIGHT-628x314.jpg";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
+		setContentView(R.layout.glide_palette_activity_main);
 
 		ImageView imageView = (ImageView) findViewById(R.id.image);
 		TextView textVibrant = (TextView) findViewById(R.id.textVibrant);
@@ -37,9 +37,6 @@ public class MainActivity extends AppCompatActivity {
 		TextView textMutedDark = (TextView) findViewById(R.id.textMutedDark);
 
 		Glide.with(this).load(URL)
-				.apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.ALL)
-						.centerCrop(this)
-				)
 				.listener(GlidePalette.with(URL)
 						.use(GlidePalette.Profile.VIBRANT)
 						.intoBackground(textVibrant, GlidePalette.Swatch.RGB)
