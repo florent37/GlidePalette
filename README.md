@@ -3,8 +3,8 @@ GlidePalette
 
 ![Alt sample](https://raw.githubusercontent.com/florent37/GlidePalette/master/screenshot/night_small_2.png)
 
-<a href="https://play.google.com/store/apps/details?id=com.github.florent37.florent.champigny">
-  <img alt="Android app on Google Play" src="https://developer.android.com/images/brand/en_app_rgb_wo_45.png" />
+<a target='_blank' rel='nofollow' href='https://app.codesponsor.io/link/iqkQGAc2EFNdScAzpwZr1Sdy/florent37/GlidePalette'>
+  <img alt='Sponsor' width='888' height='68' src='https://app.codesponsor.io/embed/iqkQGAc2EFNdScAzpwZr1Sdy/florent37/GlidePalette.svg' />
 </a>
 
 # Download
