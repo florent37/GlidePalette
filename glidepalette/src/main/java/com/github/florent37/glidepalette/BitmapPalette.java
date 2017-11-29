@@ -125,6 +125,8 @@ public abstract class BitmapPalette {
      */
     protected void apply(Palette palette, boolean cacheHit) {
 
+        if (callbacks == null) return;
+
         for (CallBack c : callbacks) {
             c.onPaletteLoaded(palette);
         }
@@ -156,6 +158,8 @@ public abstract class BitmapPalette {
 
             if (swatch == null) return;
 
+            if (target.targetsBackground == null) return;
+
             for (Pair<View, Integer> t : target.targetsBackground) {
                 int color = getColor(swatch, t.second);
                 //Only crossfade if we're not coming from a cache hit.
@@ -165,6 +169,8 @@ public abstract class BitmapPalette {
                     t.first.setBackgroundColor(color);
                 }
             }
+
+            if (target.targetsText == null) return;
 
             for (Pair<TextView, Integer> t : target.targetsText) {
                 int color = getColor(swatch, t.second);
