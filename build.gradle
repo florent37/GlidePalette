@@ -22,11 +22,11 @@ allprojects {
 }
 
 ext {
-    sdk = 25
+    sdk = 27
     buildTools = "25.0.0" //keep 25.0.0 for Continuous Integration
-    minSdk = 14
+    minSdk = 16
     libraryVersion = "2.1.1"
-    supportVersion = "25.3.1"
+    supportVersion = "27.0.2"
 
     sourceCompatibilityVersion = JavaVersion.VERSION_1_7
     targetCompatibilityVersion = JavaVersion.VERSION_1_7
