@@ -180,6 +180,8 @@ public abstract class BitmapPalette {
                 target.clear();
                 this.callbacks = null;
             }
+        } else {
+            Crashlytics.log(Log.WARN, "callback", "NULL callback on pallete");
         }
     }
 
