@@ -124,61 +124,62 @@ public abstract class BitmapPalette {
      * cacheHit true if the palette was retrieved from the cache, else false
      */
     protected void apply(Palette palette, boolean cacheHit) {
+        if(callbacks!=null){
+            if (callbacks == null) return;
 
-        if (callbacks == null) return;
-
-        for (CallBack c : callbacks) {
-            c.onPaletteLoaded(palette);
-        }
-
-        if (palette == null) return;
-
-        for (PaletteTarget target : targets) {
-            Palette.Swatch swatch = null;
-            switch (target.paletteProfile) {
-                case Profile.VIBRANT:
-                    swatch = palette.getVibrantSwatch();
-                    break;
-                case Profile.VIBRANT_DARK:
-                    swatch = palette.getDarkVibrantSwatch();
-                    break;
-                case Profile.VIBRANT_LIGHT:
-                    swatch = palette.getLightVibrantSwatch();
-                    break;
-                case Profile.MUTED:
-                    swatch = palette.getMutedSwatch();
-                    break;
-                case Profile.MUTED_DARK:
-                    swatch = palette.getDarkMutedSwatch();
-                    break;
-                case Profile.MUTED_LIGHT:
-                    swatch = palette.getLightMutedSwatch();
-                    break;
+            for (CallBack c : callbacks) {
+                c.onPaletteLoaded(palette);
             }
 
-            if (swatch == null) return;
+            if (palette == null) return;
 
-            if (target.targetsBackground == null) return;
-
-            for (Pair<View, Integer> t : target.targetsBackground) {
-                int color = getColor(swatch, t.second);
-                //Only crossfade if we're not coming from a cache hit.
-                if (!cacheHit && target.targetCrossfade) {
-                    crossfadeTargetBackground(target, t, color);
-                } else {
-                    t.first.setBackgroundColor(color);
+            for (PaletteTarget target : targets) {
+                Palette.Swatch swatch = null;
+                switch (target.paletteProfile) {
+                    case Profile.VIBRANT:
+                        swatch = palette.getVibrantSwatch();
+                        break;
+                    case Profile.VIBRANT_DARK:
+                        swatch = palette.getDarkVibrantSwatch();
+                        break;
+                    case Profile.VIBRANT_LIGHT:
+                        swatch = palette.getLightVibrantSwatch();
+                        break;
+                    case Profile.MUTED:
+                        swatch = palette.getMutedSwatch();
+                        break;
+                    case Profile.MUTED_DARK:
+                        swatch = palette.getDarkMutedSwatch();
+                        break;
+                    case Profile.MUTED_LIGHT:
+                        swatch = palette.getLightMutedSwatch();
+                        break;
                 }
+
+                if (swatch == null) return;
+
+                if (target.targetsBackground == null) return;
+
+                for (Pair<View, Integer> t : target.targetsBackground) {
+                    int color = getColor(swatch, t.second);
+                    //Only crossfade if we're not coming from a cache hit.
+                    if (!cacheHit && target.targetCrossfade) {
+                        crossfadeTargetBackground(target, t, color);
+                    } else {
+                        t.first.setBackgroundColor(color);
+                    }
+                }
+
+                if (target.targetsText == null) return;
+
+                for (Pair<TextView, Integer> t : target.targetsText) {
+                    int color = getColor(swatch, t.second);
+                    t.first.setTextColor(color);
+                }
+
+                target.clear();
+                this.callbacks = null;
             }
-
-            if (target.targetsText == null) return;
-
-            for (Pair<TextView, Integer> t : target.targetsText) {
-                int color = getColor(swatch, t.second);
-                t.first.setTextColor(color);
-            }
-
-            target.clear();
-            this.callbacks = null;
         }
     }
 
