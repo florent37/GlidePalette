@@ -232,7 +232,7 @@ public abstract class BitmapPalette {
         builder.generate(new Palette.PaletteAsyncListener() {
             @Override
             public void onGenerated(Palette palette) {
-                if (!skipCache) {
+                if (!skipCache && url != null && palette != null) {
                     CACHE.put(url, palette);
                 }
                 apply(palette, false);
