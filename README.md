@@ -129,7 +129,7 @@ Looking for contributors, feel free to fork !
 
 # Credits
 
-Author: Florent Champigny www.florentchampigny.com/
+Author: Florent Champigny
 
 Fiches Plateau Moto : [https://www.fiches-plateau-moto.fr/](https://www.fiches-plateau-moto.fr/)
 
